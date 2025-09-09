@@ -135,7 +135,6 @@ export default defineAgent({
       preemptiveSynthesis: false, //process.env.AGENT_PREEMPTIVE_SYNTHESIS === 'false',
       // minimal silence duration to consider end-of-turn
       minEndpointingDelay: parseInt(process.env.AGENT_MIN_ENDPOINTING_DELAY || '650'),
-      noiseCancellation: BackgroundVoiceCancellation(),
     };
     if (String(process.env.DEBUG_AGENT_LOGS || '').toLowerCase() === 'true') {
       console.log('agentConfig', agentConfig);
