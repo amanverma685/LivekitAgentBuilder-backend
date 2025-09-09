@@ -49,7 +49,7 @@ type ConversationResponse = {
 
 function buildConversationUrl(id: string): string {
   const base = String(process.env.FRONTEND_BASE_URL || 'https://livekit-agent-builder.vercel.app').replace(/\/$/, '');
-  return `${base}/api/conversations/${encodeURIComponent(id)}`;
+  return `${base}/api/conversation/${encodeURIComponent(id)}`;
 }
 
 function readJsonBody(req: http.IncomingMessage): Promise<any> {
