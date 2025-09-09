@@ -1,5 +1,5 @@
 {
-  "include": ["./src"],
+  "include": ["./src", "./src/types/**/*.d.ts"],
   "compilerOptions": {
     "target": "ES2017",
     "module": "ES2022",
