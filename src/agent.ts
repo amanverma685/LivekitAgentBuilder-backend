@@ -98,6 +98,12 @@ export default defineAgent({
 
     // Normalize attributes coming from upstream (API) using snake_case only
     const attributes = (participant?.attributes || {}) as any;
+    // Always log the raw attributes coming from LiveKit for debugging/traceability
+    try {
+      console.log('[agent] LiveKit participant attributes:', JSON.stringify(attributes));
+    } catch {
+      console.log('[agent] LiveKit participant attributes (non-serializable)');
+    }
     let prompt_variables: Record<string, unknown> = {};
     if (typeof attributes.prompt_variables === 'string') {
       try { prompt_variables = JSON.parse(attributes.prompt_variables); } catch { prompt_variables = {}; }
@@ -112,6 +118,9 @@ export default defineAgent({
       prompt_text: attributes.prompt_text,
       prompt_variables,
     });
+
+    // Log the compiled prompt text
+    console.log('[agent] Compiled prompt:\n' + String(prompt || ''));
 
     // Optional initial content from metadata; otherwise generic default
     let initial_content = String((prompt_variables as any)?.initial_content || '').trim() ||
