@@ -15,7 +15,6 @@ RUN ONNXRUNTIME_NODE_INSTALL=skip pnpm install --frozen-lockfile
 # Copy source and build
 COPY tsconfig.json ./
 COPY src ./src
-COPY README.md ./
 RUN pnpm run build
 
 # Prune dev dependencies for runtime
