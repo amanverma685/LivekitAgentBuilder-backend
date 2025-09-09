@@ -1,7 +1,7 @@
 ## syntax=docker/dockerfile:1
 # Minimal, production-ready image for LiveKit Agent API + Agent worker
 
-FROM node:22-slim AS build
+FROM node:20-slim AS build
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -24,7 +24,7 @@ RUN pnpm run build
 RUN pnpm prune --prod
 
 
-FROM node:22-slim AS runtime
+FROM node:20-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 

@@ -31,10 +31,13 @@
     "@livekit/agents-plugin-livekit": "^0.1.2",
     "@livekit/agents-plugin-openai": "^0.9.1",
     "@livekit/agents-plugin-silero": "^0.5.5",
-    "@livekit/noise-cancellation-node": "^0.1.9",
     "dotenv": "^16.4.5",
-    "onnxruntime-node": "^1.22.0",
     "pg": "^8.16.3"
   },
-  "resolutions": {}
+  "resolutions": {},
+  "pnpm": {
+    "overrides": {
+      "onnxruntime-node": "*"
+    }
+  }
 }

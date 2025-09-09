@@ -72,6 +72,10 @@ You can deploy either with the provided Dockerfile or the default Nixpacks flow.
 
 Health check: use `/health` on the service URL.
 
+Runtime compatibility
+- The runtime image uses Node 20 to maximize native module compatibility.
+- Noise cancellation is optional; set `ENABLE_NOISE_CANCELLATION=true` only if the image has onnxruntime-compatible libs.
+
 ```bash
 lk app env
 ```
