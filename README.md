@@ -56,6 +56,22 @@ Set up the environment by copying `.env.example` to `.env.local` and filling in 
 
 You can also do this automatically using the LiveKit CLI:
 
+## Deploying to Railway
+
+You can deploy either with the provided Dockerfile or the default Nixpacks flow.
+
+- Dockerfile (recommended):
+  - Create a new Railway service from this repo and select Dockerfile.
+  - Set env vars from `env.example` in Railway (no real secrets in the repo).
+  - Exposes port `8081`.
+
+- Nixpacks (buildpack) without Dockerfile:
+  - Railway will detect Node and run `npm start`.
+  - We added `prestart` to auto-build before start.
+  - Ensure `PORT` is set (Railway provides it; our server respects `process.env.PORT`).
+
+Health check: use `/health` on the service URL.
+
 ```bash
 lk app env
 ```

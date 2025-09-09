@@ -10,8 +10,7 @@ WORKDIR /app
 
 # Install dependencies using lockfile only
 COPY pnpm-lock.yaml package.json ./
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    ONNXRUNTIME_NODE_INSTALL=skip pnpm install --frozen-lockfile
+RUN ONNXRUNTIME_NODE_INSTALL=skip pnpm install --frozen-lockfile
 
 # Copy source and build
 COPY tsconfig.json ./
