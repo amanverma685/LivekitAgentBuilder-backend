@@ -28,6 +28,11 @@ FROM node:20-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 
+# Install CA certificates so TLS requests validate properly
+RUN apt-get update -qq \
+  && apt-get install --no-install-recommends -y ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
 # Copy production node_modules and built dist only
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
