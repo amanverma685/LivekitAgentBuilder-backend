@@ -48,8 +48,8 @@ type ConversationResponse = {
 // in-memory cache removed; we do not reuse conversation IDs anymore
 
 function buildConversationUrl(id: string): string {
-  const base = "http://localhost:3000";
-  return `${base}/api/conversation/${encodeURIComponent(id)}`;
+  const base = String(process.env.FRONTEND_BASE_URL || 'https://livekit-agent-builder.vercel.app').replace(/\/$/, '');
+  return `${base}/api/conversations/${encodeURIComponent(id)}`;
 }
 
 function readJsonBody(req: http.IncomingMessage): Promise<any> {
