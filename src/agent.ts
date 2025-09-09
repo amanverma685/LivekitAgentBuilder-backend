@@ -20,7 +20,8 @@ import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generatePrompt } from './promptManager.js';
-import { BackgroundVoiceCancellation } from '@livekit/noise-cancellation-node';
+// Noise cancellation depends on onnxruntime native binaries which may not be
+// available in minimal containers. We will load it dynamically only if enabled.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Load env from project root: first .env, then .env.local to allow local overrides
@@ -140,6 +141,18 @@ export default defineAgent({
       console.log('agentConfig', agentConfig);
     }
 
+    // Optionally enable noise cancellation if the dependency is available
+    let noiseCancellation: any = undefined;
+    if (String(process.env.ENABLE_NOISE_CANCELLATION || '').toLowerCase() === 'true') {
+      try {
+        const mod = await import('@livekit/noise-cancellation-node');
+        // BackgroundVoiceCancellation returns a transform factory
+        noiseCancellation = (mod as any).BackgroundVoiceCancellation?.();
+      } catch (err) {
+        console.warn('[agent] Noise cancellation not available, continuing without it');
+      }
+    }
+
     const agent = new pipeline.VoicePipelineAgent(
       vad,
       new deepgram.STT({
@@ -150,7 +163,7 @@ export default defineAgent({
       new openai.LLM({ model: process.env.OPENAI_MODEL || 'gpt-4o-mini' }),
       // new elevenlabs.TTS(),
       new cartesia.TTS({ voice: process.env.CARTESIA_VOICE_ID || '78ab82d5-25be-4f7d-82b3-7ad64e5b85b2' }),
-      agentConfig,
+      { ...agentConfig, noiseCancellation },
     );
     agent.start(ctx.room, participant);
 

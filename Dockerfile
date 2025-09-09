@@ -11,6 +11,8 @@ WORKDIR /app
 # Install dependencies using lockfile only
 COPY pnpm-lock.yaml package.json ./
 # Install deps (allow postinstall to fetch onnxruntime native binary)
+ARG ENABLE_NOISE_CANCELLATION=false
+ENV ENABLE_NOISE_CANCELLATION=${ENABLE_NOISE_CANCELLATION}
 RUN pnpm install --no-frozen-lockfile
 
 # Copy source and build
