@@ -1,0 +1,18 @@
+# Docker build context ignores
+node_modules
+coverage
+.pnpm-store
+.pnpm-debug.log*
+.git
+.github
+.gitignore
+.vscode
+.idea
+.env
+.env.local
+logs
+**/*.md
+src/**/*.test.*
+**/*.spec.*
+**/__tests__/**
+**/*.map
