@@ -10,7 +10,8 @@ WORKDIR /app
 
 # Install dependencies using lockfile only
 COPY pnpm-lock.yaml package.json ./
-RUN ONNXRUNTIME_NODE_INSTALL=skip pnpm install --frozen-lockfile
+# Use non-frozen install to avoid lockfile/overrides mismatch on Railway builders
+RUN ONNXRUNTIME_NODE_INSTALL=skip pnpm install --no-frozen-lockfile
 
 # Copy source and build
 COPY tsconfig.json ./
