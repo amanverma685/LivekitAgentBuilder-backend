@@ -68,17 +68,18 @@ const logConfiguration = () => {
 
 export default defineAgent({
   prewarm: async (proc: JobProcess) => {
+    const desiredSampleRate = parseInt(process.env.VAD_SAMPLE_RATE || '16000');
+    const sampleRate = (desiredSampleRate === 8000 ? 8000 : 16000) as 8000 | 16000;
     const vadConfig = {
       minSpeechDuration: parseFloat(process.env.VAD_MIN_SPEECH_DURATION || '0.05'),
       minSilenceDuration: parseFloat(process.env.VAD_MIN_SILENCE_DURATION || '0.55'),
-      prefix_padding_duration: parseFloat(process.env.VAD_PREFIX_PADDING_DURATION || '0.5'),
-      max_buffered_speech: parseFloat(process.env.VAD_MAX_BUFFERED_SPEECH || '60.0'),
-      activation_threshold: parseFloat(process.env.VAD_ACTIVATION_THRESHOLD || '0.5'),
-      sample_rate: parseInt(process.env.VAD_SAMPLE_RATE || '16000'),
-      force_cpu: process.env.VAD_FORCE_CPU === 'true',
-
+      prefixPaddingDuration: parseFloat(process.env.VAD_PREFIX_PADDING_DURATION || '0.5'),
+      maxBufferedSpeech: parseFloat(process.env.VAD_MAX_BUFFERED_SPEECH || '60.0'),
+      activationThreshold: parseFloat(process.env.VAD_ACTIVATION_THRESHOLD || '0.5'),
+      sampleRate,
+      forceCPU: process.env.VAD_FORCE_CPU === 'true',
     };
-    proc.userData.vad = await silero.VAD.load();
+    proc.userData.vad = await silero.VAD.load(vadConfig);
   },
   entry: async (ctx: JobContext) => {
     // Log current configuration
