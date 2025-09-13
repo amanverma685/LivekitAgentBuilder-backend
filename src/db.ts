@@ -161,4 +161,34 @@ export async function insertConversation(params: InsertConversationParams): Prom
   return result.rows[0]?.id as string;
 }
 
+export type ConversationRow = {
+  id: string;
+  conversation_type: string;
+  prompt_name: string | null;
+  prompt_label: string | null;
+  agent_name: string;
+  webhook_link: string;
+  company_name: string | null;
+  prompt_text: string | null;
+  agent_description: string | null;
+  media_mode: 'audio_only' | 'audio_video';
+  prompt_variables: Record<string, unknown>;
+  ui_variables: Record<string, unknown>;
+  complete_screen: Record<string, unknown>;
+  created_at: string;
+};
+
+export async function getConversationById(id: string): Promise<ConversationRow | null> {
+  const result = await getPool().query(
+    `select id, conversation_type, prompt_name, prompt_label, agent_name, webhook_link, company_name,
+            prompt_text, agent_description, media_mode,
+            prompt_variables, ui_variables, complete_screen, created_at
+       from conversations where id = $1 limit 1`,
+    [id],
+  );
+  const row = result.rows?.[0];
+  if (!row) return null;
+  return row as ConversationRow;
+}
+
 

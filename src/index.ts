@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
-import { initDb, insertConversation } from './db.js';
+import { initDb, insertConversation, getConversationById } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Load env from project root: first .env, then .env.local to allow local overrides
@@ -142,6 +142,34 @@ const server = http.createServer(async (req, res) => {
     } catch (err) {
       res.writeHead(400, { 'content-type': 'application/json' });
       res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+      return;
+    }
+  }
+
+  // GET /api/conversations/:id => return stored conversation row (including media_mode)
+  if (req.method === 'GET' && pathname && pathname.startsWith('/api/conversations/')) {
+    try {
+      const parts = pathname.split('/');
+      const id = parts[parts.length - 1];
+      if (!id || id.trim() === '') {
+        res.writeHead(400, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Missing conversation id' }));
+        return;
+      }
+
+      await initDb();
+      const row = await getConversationById(id);
+      if (!row) {
+        res.writeHead(404, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Conversation not found' }));
+        return;
+      }
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify(row));
+      return;
+    } catch (err) {
+      res.writeHead(500, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Failed to fetch conversation' }));
       return;
     }
   }
