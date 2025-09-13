@@ -33,6 +33,7 @@ type ConversationRequest = {
   webhook_link?: string;
   id?: string; // conversation id (uuid) optional
   company_name?: string;
+  media_mode?: 'audio_only' | 'audio_video';
   prompt_variables?: Record<string, unknown>;
   ui_variables?: Record<string, unknown>;
   created_at?: string;
@@ -92,6 +93,7 @@ const server = http.createServer(async (req, res) => {
       const company_name = (body as any).company_name;
       const prompt_text = (body as any).prompt_text;
       const agent_description = (body as any).agent_description;
+      let media_mode = (body as any).media_mode as 'audio_only' | 'audio_video' | undefined;
       const prompt_variables = (body as any).prompt_variables || {};
       const ui_variables = (body as any).ui_variables || {};
       const complete_screen = (ui_variables as any)?.complete_screen || {};
@@ -111,6 +113,9 @@ const server = http.createServer(async (req, res) => {
 
       const id = body.id && body.id.trim() !== '' ? body.id : randomUUID();
 
+      // normalize and validate media_mode
+      media_mode = media_mode === 'audio_video' ? 'audio_video' : 'audio_only';
+
       // persist to database with new schema
       await insertConversation({
         id,
@@ -122,6 +127,7 @@ const server = http.createServer(async (req, res) => {
         webhook_link,
         company_name,
         prompt_text,
+        media_mode,
         prompt_variables: (prompt_variables && typeof prompt_variables === 'object') ? prompt_variables as Record<string, unknown> : {},
         ui_variables: (ui_variables && typeof ui_variables === 'object') ? ui_variables as Record<string, unknown> : {},
         complete_screen: (complete_screen && typeof complete_screen === 'object') ? complete_screen as Record<string, unknown> : {},

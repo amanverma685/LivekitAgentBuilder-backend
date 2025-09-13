@@ -29,6 +29,7 @@ export async function initDb(): Promise<void> {
       company_name text,
       prompt_text text,
       agent_description text,
+      media_mode text not null default 'audio_only',
       prompt_variables jsonb not null default '{}'::jsonb,
       ui_variables jsonb not null default '{}'::jsonb,
       complete_screen jsonb not null default '{}'::jsonb,
@@ -54,6 +55,9 @@ export async function initDb(): Promise<void> {
   `);
   await getPool().query(`
     alter table conversations add column if not exists complete_screen jsonb not null default '{}'::jsonb;
+  `);
+  await getPool().query(`
+    alter table conversations add column if not exists media_mode text not null default 'audio_only';
   `);
 
   // If legacy meta_data column exists, migrate its values and drop it
@@ -82,6 +86,7 @@ export type InsertConversationParams = {
   company_name?: string;
   prompt_text?: string;
   agent_description?: string;
+  media_mode?: 'audio_only' | 'audio_video';
   prompt_variables: Record<string, unknown>;
   ui_variables: Record<string, unknown>;
   complete_screen: Record<string, unknown>;
@@ -98,6 +103,7 @@ export async function insertConversation(params: InsertConversationParams): Prom
     company_name,
     prompt_text,
     agent_description,
+    media_mode,
     prompt_variables,
     ui_variables,
     complete_screen,
@@ -115,10 +121,11 @@ export async function insertConversation(params: InsertConversationParams): Prom
         company_name,
         prompt_text,
         agent_description,
+        media_mode,
         prompt_variables,
         ui_variables,
         complete_screen
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, ($10)::jsonb, ($11)::jsonb, ($12)::jsonb)
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, ($11)::jsonb, ($12)::jsonb, ($13)::jsonb)
       on conflict (id) do update set
         conversation_type = excluded.conversation_type,
         prompt_name = excluded.prompt_name,
@@ -128,6 +135,7 @@ export async function insertConversation(params: InsertConversationParams): Prom
         company_name = excluded.company_name,
         prompt_text = excluded.prompt_text,
         agent_description = excluded.agent_description,
+        media_mode = excluded.media_mode,
         prompt_variables = excluded.prompt_variables,
         ui_variables = excluded.ui_variables,
         complete_screen = excluded.complete_screen
@@ -143,6 +151,7 @@ export async function insertConversation(params: InsertConversationParams): Prom
       company_name ?? null,
       prompt_text ?? null,
       agent_description ?? null,
+      (media_mode === 'audio_video' ? 'audio_video' : 'audio_only'),
       JSON.stringify(prompt_variables ?? {}),
       JSON.stringify(ui_variables ?? {}),
       JSON.stringify(complete_screen ?? {}),
